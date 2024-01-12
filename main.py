@@ -6,8 +6,9 @@ import psycopg2
 from telegram import InputMediaPhoto
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
+import os 
 from dotenv import load_dotenv
-import os
+
 load_dotenv(".env")
 
 # Get the values using os.getenv
@@ -28,6 +29,7 @@ database_name = db_name
 user = db_user
 password = db_password
 table_name = "events"
+
 selected_event_type = None  # New global variable to store selected event type
 
 def start(update: Update, context: CallbackContext) -> None:
