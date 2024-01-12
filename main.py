@@ -7,29 +7,16 @@ from telegram import InputMediaPhoto
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler, Filters
 import os 
-from dotenv import load_dotenv
+import dotenv
 
-load_dotenv(".env")
-
-# Get the values using os.getenv
-database_url = os.getenv('DATABASE_URL')
-bot_token = os.getenv('BOT_TOKEN')
+bot_token = '6773122549:AAGvLcCUSOHDz9AuHUxUvP73zc5asC1RBI8'
 
 # Database connection parameters
-
-database_url_parts = database_url.split("://")[1].split(":")
-db_user = database_url_parts[0]
-db_password = database_url_parts[1].split("@")[0]
-db_host = database_url_parts[1].split("@")[1]
-db_name = database_url.split("/")[-1]
-
-    # Database connection parameters
-host = db_host
-database_name = db_name
-user = db_user
-password = db_password
+host = "connectify-db.postgres.database.azure.com"
+database_name = "connectify"
+user = "connectifyadmin"
+password = "Eden258eden"
 table_name = "events"
-
 selected_event_type = None  # New global variable to store selected event type
 
 def start(update: Update, context: CallbackContext) -> None:
@@ -189,7 +176,10 @@ dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_ev
 dispatcher.add_handler(CommandHandler("getselectedevents", get_selected_events))
 
 # Start the Bot
-updater.start_polling()
-
+updater.start_webhook(listen="0.0.0.0",
+                      port=int(os.environ.get('PORT', 5000)),
+                      url_path=bot_token,
+                      webhook_url=  + bot_token
+                      )
 # Run the bot until you send a signal to stop it
 updater.idle()
