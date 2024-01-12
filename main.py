@@ -9,6 +9,7 @@ from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandle
 import os 
 import dotenv
 
+PORT = int(os.environ.get('PORT', 5000))
 bot_token = '6773122549:AAGvLcCUSOHDz9AuHUxUvP73zc5asC1RBI8'
 
 # Database connection parameters
@@ -161,25 +162,24 @@ def get_selected_events(update: Update, context: CallbackContext) -> None:
             update.message.reply_text(f"Event:\n\n{event_str}\n")
     else:
         update.message.reply_text("No event type selected. Use /selectcategory command to choose an event type.")
+def main():
+    # Create the Updater and pass it your bot's token
+    updater = Updater(token=bot_token, use_context=True)
 
-# Create the Updater and pass it your bot's token
-updater = Updater(token=bot_token, use_context=True)
+    # Get the dispatcher to register handlers
+    dispatcher = updater.dispatcher
 
-# Get the dispatcher to register handlers
-dispatcher = updater.dispatcher
+    # Register command handlers
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("getall", get_all_events))
+    dispatcher.add_handler(CommandHandler("selectcategory", special_event_type))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_event_type_selection))
+    dispatcher.add_handler(CommandHandler("getselectedevents", get_selected_events))
 
-# Register command handlers
-dispatcher.add_handler(CommandHandler("start", start))
-dispatcher.add_handler(CommandHandler("getall", get_all_events))
-dispatcher.add_handler(CommandHandler("selectcategory", special_event_type))
-dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_event_type_selection))
-dispatcher.add_handler(CommandHandler("getselectedevents", get_selected_events))
-
-# Start the Bot
-updater.start_webhook(listen="0.0.0.0",
-                      port=int(os.environ.get('PORT', 5000)),
-                      url_path=bot_token,
-                      webhook_url=  + bot_token
-                      )
-# Run the bot until you send a signal to stop it
-updater.idle()
+    # Start the Bot
+    updater.start_webhook(listen="0.0.0.0",
+                            port=int(PORT),
+                            url_path=bot_token)
+    updater.bot.setWebhook('https://connectifytelegrambot-6174d0cead9c.herokuapp.com/' + bot_token)
+if __name__ == '__main__':
+    main()
